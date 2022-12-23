@@ -32,9 +32,9 @@ io.on('connection', (socket) => {
 //     });
 // });
 io.on('connection', (socket) => { // when there is event 'send-frame' then do sth
-    socket.on('send-frame', (data) => {
+    socket.on('send-frame', async (data) => {
             console.log(data);
-            io.sockets.emit('on-frame-react', data)
+            socket.broadcast.emit('on-frame-react', data)
         })
 });
 

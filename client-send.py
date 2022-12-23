@@ -1,6 +1,5 @@
 import socketio
 import asyncio
-import time
 import base64
 import random
 import cv2
@@ -28,17 +27,27 @@ async def disconnect():
 
 @sio.event
 async def send_frame():
-    for i in range(10):
-        frame = ''
-        str = ''
-        time.sleep(6)
-        randomPath = random.choice(listPath)
-        print(randomPath)
-        with open(randomPath, "rb")  as image:
-            str = base64.b64encode(image.read())
-        frame = str.decode('utf-8')
-        await sio.emit('send-frame', {'frame': frame})
-        i = i+1
+    vid = cv2.VideoCapture('./assets/video.mp4')
+    try:
+        while vid.isOpened():
+            ret, frame = vid.read()
+            assert ret       
+            try:
+                cv2.imshow('Frame', frame)
+                frame = cv2.imencode('.jpg'. frame)
+                frame_b64 = base64.b64encode(frame).decode('utf-8')
+                await sio.emit('send-frame', {'frame': frame})
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    print("\nExiting.")
+                    vid.release()
+                    cv2.destroyAllWindows()
+                    break
+            except cv2.error as err:
+                print(err)
+    except:
+        print("\nExiting.")
+        vid.release()
+        cv2.destroyAllWindows()
 @sio.event
 async def send_frame1():
     for i in range(20):
@@ -56,7 +65,7 @@ async def send_frame1():
 
 async def main():
     await sio.connect('http://localhost:3001')
-    await send_frame1()
+    await send_frame()
     await sio.wait()
 
 
