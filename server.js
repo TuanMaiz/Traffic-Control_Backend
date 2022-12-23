@@ -24,6 +24,10 @@ const port = process.env.PORT || 3001
 //websocket part
 io.on('connection', (socket) => {
     console.log(`User ${socket.id} connected`);
+    socket.on('send-frame', async (data) => {
+        console.log(data);
+        socket.broadcast.emit('on-frame-react', data)
+    })
 })
 // io.on('connection', (socket) => { // when there is event 'on-chat' then do sth
 //     socket.on('on-chat', (data) => {
@@ -31,12 +35,7 @@ io.on('connection', (socket) => {
 //       io.sockets.emit('on-chat-react', data)
 //     });
 // });
-io.on('connection', (socket) => { // when there is event 'send-frame' then do sth
-    socket.on('send-frame', async (data) => {
-            console.log(data);
-            socket.broadcast.emit('on-frame-react', data)
-        })
-});
+
 
 //mongodb part
 // const mongoose = require('mongoose')
